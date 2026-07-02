@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>AI 减脂厨师 | 智能搭配你的每一餐</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-wrapper">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo">🥗 AI 减脂厨师</div>
+    <div class="header-sub">不知道吃什么？告诉我你的食材，我帮你搭配</div>
+  </header>
+
+  <!-- 输入区 -->
+  <section class="input-section">
+    <div class="input-row">
+      <input
+        type="text"
+        id="ingredientInput"
+        class="ingredient-input"
+        placeholder="输入食材名称，如：鸡胸肉、西兰花..."
+        autocomplete="off"
+      />
+      <button class="btn-add" id="btnAdd">+添加</button>
+    </div>
+    <div class="tags-area" id="tagsArea"></div>
+
+    <!-- 快捷食材 -->
+    <div class="quick-ingredients">
+      <span class="quick-label">常用：</span>
+      <span class="quick-chip" data-ingredient="鸡胸肉">鸡胸肉</span>
+      <span class="quick-chip" data-ingredient="鸡蛋">鸡蛋</span>
+      <span class="quick-chip" data-ingredient="西兰花">西兰花</span>
+      <span class="quick-chip" data-ingredient="番茄">番茄</span>
+      <span class="quick-chip" data-ingredient="虾仁">虾仁</span>
+      <span class="quick-chip" data-ingredient="牛肉">牛肉</span>
+      <span class="quick-chip" data-ingredient="豆腐">豆腐</span>
+      <span class="quick-chip" data-ingredient="燕麦">燕麦</span>
+    </div>
+
+    <!-- 偏好 -->
+    <div class="preference-row">
+      <span class="pref-label">🎯 偏好：</span>
+      <button class="pref-btn active" data-category="all">全部</button>
+      <button class="pref-btn" data-category="diet">🥗 减脂</button>
+      <button class="pref-btn" data-category="cheat">🍕 放纵</button>
+    </div>
+
+    <button class="btn-search" id="btnSearch">
+      <span class="sparkle">✨</span> AI 智能推荐
+    </button>
+  </section>
+
+  <!-- 结果区 -->
+  <section class="results-section" id="resultsSection">
+    <div class="results-header" id="resultsHeader" style="display:none;">
+      <span id="resultsCount"></span>
+      <span class="ai-badge">🤖 AI 匹配</span>
+    </div>
+    <div class="results-grid" id="resultsGrid"></div>
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🥬</div>
+      <div class="empty-title">输入食材，开始搭配</div>
+      <div class="empty-desc">支持的食材：鸡胸肉、鸡蛋、牛肉、鱼虾、豆腐<br>蔬菜、菌菇等各种常见食材</div>
+    </div>
+  </section>
+
+  <!-- 详情弹窗 -->
+  <div class="modal-overlay" id="modalOverlay" style="display:none;">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+</div>
+
+<script src="recipes.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
