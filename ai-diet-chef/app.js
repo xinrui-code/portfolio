@@ -1,3 +1,4 @@
+
 // ===== AI 减脂厨师 - 核心逻辑 =====
 
 const App = {
@@ -7,7 +8,6 @@ const App = {
 
   // 🔑 AI API 配置（获取免费 Key: https://platform.deepseek.com）
   AI_API_KEY: 'sk-b16c2b79d9e04a829dddef4259582bd9',
-  AI_API_URL: 'https://api.deepseek.com/v1/chat/completions',
   USE_AI: false,   // 是否启用 AI（有 Key 自动启用）
 
   init() {
@@ -118,13 +118,16 @@ const App = {
     btn.disabled = false
   },
 
-  // 🔥 调用 DeepSeek AI
+  // 🔥 调用 DeepSeek AI（通过 CORS 代理）
   async callAI() {
     const preference = this.currentCategory === 'diet' ? '只推荐低脂减脂餐。' :
                        this.currentCategory === 'cheat' ? '只推荐放纵美食。' :
                        '减脂餐和放纵餐都可以推荐。'
 
-    const response = await fetch(this.AI_API_URL, {
+    // 使用 CORS 代理绕过浏览器限制
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://api.deepseek.com/v1/chat/completions')
+
+    const response = await fetch(proxyUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
