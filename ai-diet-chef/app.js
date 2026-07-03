@@ -1,4 +1,3 @@
-
 // ===== AI 减脂厨师 - 核心逻辑 =====
 
 const App = {
@@ -88,10 +87,7 @@ const App = {
   },
 
   async search() {
-    if (this.ingredients.length === 0) {
-      this.showToast('请先添加食材哦~')
-      return
-    }
+    const hasIngredients = this.ingredients.length > 0
     const btn = document.getElementById('btnSearch')
     const originalText = btn.innerHTML
     btn.innerHTML = '<span class="sparkle">🤔</span> AI 思考中...'
@@ -102,15 +98,15 @@ const App = {
     if (this.USE_AI) {
       // 🤖 优先用真实 AI
       try {
-        results = await this.callAI()
+        results = await this.callAI(hasIngredients)
       } catch (e) {
         console.log('AI 调用失败，使用本地匹配:', e.message)
       }
     }
 
-    // 如果 AI 没结果，用本地匹配
+    // 如果 AI 没结果，用本地匹配/随机推荐
     if (results.length === 0) {
-      results = this.matchRecipes()
+      results = hasIngredients ? this.matchRecipes() : this.randomRecipes()
     }
 
     this.renderResults(results)
@@ -119,14 +115,19 @@ const App = {
   },
 
   // 🔥 调用 DeepSeek AI（通过 CORS 代理）
-  async callAI() {
-    const preference = this.currentCategory === 'diet' ? '只推荐低脂减脂餐。' :
-                       this.currentCategory === 'cheat' ? '只推荐放纵美食。' :
-                       '减脂餐和放纵餐都可以推荐。'
+  async callAI(hasIngredients) {
+    const categoryText = this.currentCategory === 'diet' ? '只推荐低脂减脂餐。' :
+                          this.currentCategory === 'cheat' ? '只推荐放纵美食。' :
+                          '减脂餐和放纵餐都可以推荐。'
 
-    const apiUrl = 'https://api.deepseek.com/v1/chat/completions'
+    let userPrompt
+    if (hasIngredients) {
+      userPrompt = '我手头有这些食材：' + this.ingredients.join('、') + '。请根据这些食材推荐菜谱。'
+    } else {
+      userPrompt = '请随机推荐 5 道美味的' + (this.currentCategory === 'diet' ? '减脂餐' : this.currentCategory === 'cheat' ? '放纵美食' : '减脂餐和放纵餐') + '，不限制食材。'
+    }
 
-    const response = await fetch(apiUrl, {
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -136,12 +137,12 @@ const App = {
         model: 'deepseek-chat',
         messages: [{
           role: 'system',
-          content: '你是专业健身减脂厨师。用户告诉你手头食材，你推荐 3-5 道菜。返回纯 JSON 数组，不要 markdown。每道菜格式：{"name":"菜名","category":"diet或cheat","calories":数字,"protein":数字,"carbs":数字,"fat":数字,"time":"烹饪时间","difficulty":"简单/中等/困难","ingredients":["食材1","食材2"],"steps":["步骤1","步骤2"],"tags":["标签"]}。' + preference
+          content: '你是专业健身减脂厨师。推荐 4-6 道菜。返回纯 JSON 数组，不要 markdown。每道菜格式：{"name":"菜名","category":"diet或cheat","calories":数字,"protein":数字,"carbs":数字,"fat":数字,"time":"烹饪时间","difficulty":"简单/中等/困难","ingredients":["食材1"],"steps":["步骤1"],"tags":["标签"]}。' + categoryText
         }, {
           role: 'user',
-          content: '我手头有这些食材：' + this.ingredients.join('、')
+          content: userPrompt
         }],
-        temperature: 0.8,
+        temperature: 0.9,
         max_tokens: 2000
       })
     })
@@ -159,6 +160,17 @@ const App = {
       score: 100,
       matchedCount: r.ingredients.length
     }))
+  },
+
+  // 🎲 一键随机推荐（无食材时）
+  randomRecipes() {
+    let pool = this.allRecipes
+    if (this.currentCategory !== 'all') {
+      pool = pool.filter(r => r.category === this.currentCategory)
+    }
+    // 随机打乱取 6 个
+    const shuffled = [...pool].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, 6).map(r => ({ recipe: r, score: 50, matchedCount: 0 }))
   },
 
   matchRecipes() {
