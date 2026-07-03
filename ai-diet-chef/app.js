@@ -124,10 +124,9 @@ const App = {
                        this.currentCategory === 'cheat' ? '只推荐放纵美食。' :
                        '减脂餐和放纵餐都可以推荐。'
 
-    // 使用 CORS 代理绕过浏览器限制
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://api.deepseek.com/v1/chat/completions')
+    const apiUrl = 'https://api.deepseek.com/v1/chat/completions'
 
-    const response = await fetch(proxyUrl, {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
