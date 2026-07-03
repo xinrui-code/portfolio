@@ -5,7 +5,17 @@ const App = {
   currentCategory: 'all',
   allRecipes: RECIPES,
 
+  // 🔑 AI API 配置（获取免费 Key: https://platform.deepseek.com）
+  AI_API_KEY: 'sk-b16c2b79d9e04a829dddef4259582bd9',
+  AI_API_URL: 'https://api.deepseek.com/v1/chat/completions',
+  USE_AI: false,   // 是否启用 AI（有 Key 自动启用）
+
   init() {
+    // 如果有 API Key 则启用 AI
+    if (this.AI_API_KEY) {
+      this.USE_AI = true
+      console.log('🤖 AI 模式已启用')
+    }
     this.bindEvents()
     document.querySelectorAll('.quick-chip').forEach(chip => {
       chip.addEventListener('click', () => this.addIngredient(chip.dataset.ingredient))
@@ -77,7 +87,7 @@ const App = {
     })
   },
 
-  search() {
+  async search() {
     if (this.ingredients.length === 0) {
       this.showToast('请先添加食材哦~')
       return
@@ -87,12 +97,66 @@ const App = {
     btn.innerHTML = '<span class="sparkle">🤔</span> AI 思考中...'
     btn.disabled = true
 
-    setTimeout(() => {
-      const results = this.matchRecipes()
-      this.renderResults(results)
-      btn.innerHTML = originalText
-      btn.disabled = false
-    }, 500)
+    let results = []
+
+    if (this.USE_AI) {
+      // 🤖 优先用真实 AI
+      try {
+        results = await this.callAI()
+      } catch (e) {
+        console.log('AI 调用失败，使用本地匹配:', e.message)
+      }
+    }
+
+    // 如果 AI 没结果，用本地匹配
+    if (results.length === 0) {
+      results = this.matchRecipes()
+    }
+
+    this.renderResults(results)
+    btn.innerHTML = originalText
+    btn.disabled = false
+  },
+
+  // 🔥 调用 DeepSeek AI
+  async callAI() {
+    const preference = this.currentCategory === 'diet' ? '只推荐低脂减脂餐。' :
+                       this.currentCategory === 'cheat' ? '只推荐放纵美食。' :
+                       '减脂餐和放纵餐都可以推荐。'
+
+    const response = await fetch(this.AI_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + this.AI_API_KEY
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{
+          role: 'system',
+          content: '你是专业健身减脂厨师。用户告诉你手头食材，你推荐 3-5 道菜。返回纯 JSON 数组，不要 markdown。每道菜格式：{"name":"菜名","category":"diet或cheat","calories":数字,"protein":数字,"carbs":数字,"fat":数字,"time":"烹饪时间","difficulty":"简单/中等/困难","ingredients":["食材1","食材2"],"steps":["步骤1","步骤2"],"tags":["标签"]}。' + preference
+        }, {
+          role: 'user',
+          content: '我手头有这些食材：' + this.ingredients.join('、')
+        }],
+        temperature: 0.8,
+        max_tokens: 2000
+      })
+    })
+
+    const data = await response.json()
+    const content = data.choices[0].message.content
+
+    // 解析 AI 返回的 JSON
+    const jsonStr = content.replace(/```json\n?/g, '').replace(/```/g, '').trim()
+    const recipes = JSON.parse(jsonStr)
+
+    // 给每个菜谱一个临时 ID
+    return recipes.map((r, i) => ({
+      recipe: { ...r, id: 'ai-' + i },
+      score: 100,
+      matchedCount: r.ingredients.length
+    }))
   },
 
   matchRecipes() {
@@ -231,23 +295,5 @@ const App = {
   }
 }
 
-// ===== AI API 接口预留 =====
-// 未来接入真实 AI (DeepSeek/OpenAI) 只需取消注释并填入 API Key
-// async function callAIChef(ingredients, preference) {
-//   const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-//     method: 'POST',
-//     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer YOUR_API_KEY' },
-//     body: JSON.stringify({
-//       model: 'deepseek-chat',
-//       messages: [{
-//         role: 'system',
-//         content: '你是专业健身减脂厨师。根据用户食材推荐 3 道菜，包含菜名、热量、三大营养素、做法步骤。' + (preference === 'diet' ? '只推荐减脂餐。' : preference === 'cheat' ? '只推荐放纵美食。' : '')
-//       }, { role: 'user', content: '我有：' + ingredients.join('、') }],
-//       temperature: 0.7
-//     })
-//   })
-//   const data = await response.json()
-//   return data.choices[0].message.content
-// }
-
+// ===== 启动 =====
 document.addEventListener('DOMContentLoaded', () => App.init())
