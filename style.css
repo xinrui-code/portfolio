@@ -91,7 +91,7 @@ body{
 /* ===== Projects ===== */
 .projects{max-width:960px;margin:0 auto;padding:80px 24px}
 .project-card{display:flex;gap:44px;background:var(--card);border-radius:24px;padding:40px;margin-bottom:28px;border:1px solid var(--border);transition:all .4s;position:relative;overflow:hidden}
-.project-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(74,222,128,.03),transparent 70%);opacity:0;transition:opacity .4s}
+.project-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(74,222,128,.03),transparent 70%);opacity:0;transition:opacity .4s;pointer-events:none}
 .project-card:hover::before{opacity:1}
 .project-card:hover{border-color:rgba(74,222,128,.25);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
 .project-card.featured{border-color:rgba(74,222,128,.15)}
