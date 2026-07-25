@@ -42,6 +42,37 @@
       <span class="quick-chip" data-ingredient="燕麦">燕麦</span>
     </div>
 
+    <!-- 身材档案 -->
+    <div class="profile-toggle" id="profileToggle" onclick="document.getElementById('profileForm').classList.toggle('open');this.classList.toggle('active')">
+      👤 填身材档案，精准推荐 <span class="toggle-arrow">▾</span>
+    </div>
+    <div class="profile-form" id="profileForm">
+      <div class="pf-row">
+        <div class="pf-item">
+          <label>性别</label>
+          <div class="pf-radio-group">
+            <button class="pf-radio active" data-gender="male" onclick="App.setGender('male',this)">👨 男</button>
+            <button class="pf-radio" data-gender="female" onclick="App.setGender('female',this)">👩 女</button>
+          </div>
+        </div>
+        <div class="pf-item">
+          <label>年龄</label>
+          <input type="number" id="pfAge" placeholder="25" class="pf-input">
+        </div>
+      </div>
+      <div class="pf-row">
+        <div class="pf-item">
+          <label>身高 cm</label>
+          <input type="number" id="pfHeight" placeholder="170" class="pf-input">
+        </div>
+        <div class="pf-item">
+          <label>体重 kg</label>
+          <input type="number" id="pfWeight" placeholder="65" class="pf-input">
+        </div>
+      </div>
+      <div class="pf-result" id="pfResult" style="display:none"></div>
+    </div>
+
     <!-- 偏好 -->
     <div class="preference-row">
       <span class="pref-label">🎯 偏好：</span>
@@ -84,4 +115,3 @@
 <script src="app.js"></script>
 </body>
 </html>
-
