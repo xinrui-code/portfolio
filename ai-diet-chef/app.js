@@ -6,7 +6,7 @@ const App = {
   allRecipes: RECIPES,
 
   // 🔑 AI API 配置（获取免费 Key: https://platform.deepseek.com）
-  AI_API_KEY: 'sk-b16c2b79d9e04a829dddef4259582bd9',
+  AI_API_KEY: '',
   USE_AI: false,   // 是否启用 AI（有 Key 自动启用）
 
   init() {
