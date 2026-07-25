@@ -215,31 +215,95 @@ body {
 
 .pref-btn:hover:not(.active) { border-color: var(--green); color: var(--green); }
 
-/* Search Button */
-.btn-search {
-  width: 100%;
-  height: 56px;
-  margin-top: 20px;
-  background: linear-gradient(135deg, var(--green), #45a049);
-  color: #fff;
-  border: none;
-  border-radius: 16px;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
+/* Dual Button Row */
+.btn-row-dual {
+  display: flex; gap: 12px; margin-top: 20px;
+}
+.btn-search, .btn-mealplan {
+  flex: 1; height: 56px; color: #fff; border: none; border-radius: 16px;
+  font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s;
   letter-spacing: 1px;
+}
+.btn-search {
+  background: linear-gradient(135deg, var(--green), #45a049);
   box-shadow: 0 4px 16px rgba(76,175,80,0.35);
 }
-
-.btn-search:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(76,175,80,0.45);
+.btn-mealplan {
+  background: linear-gradient(135deg, var(--orange), #F57C00);
+  box-shadow: 0 4px 16px rgba(255,152,0,0.35);
 }
 
-.btn-search:active { transform: scale(0.97); }
-
+.btn-search:hover, .btn-mealplan:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+.btn-search:active, .btn-mealplan:active { transform: scale(0.97); }
 .sparkle { font-size: 20px; }
+
+/* Meal Plan Cards */
+.mealplan-section { margin-bottom: 24px; }
+.mealplan-title {
+  font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 16px;
+}
+.mealplan-meals { display: flex; flex-direction: column; gap: 12px; }
+.mealplan-card {
+  background: var(--card); border-radius: var(--radius-lg); padding: 20px 24px;
+  box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px;
+  cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+  animation: cardIn 0.4s ease backwards;
+}
+.mealplan-card:hover { transform: translateX(4px); border-color: var(--green); }
+.mealplan-card .mp-icon { font-size: 36px; flex-shrink: 0; }
+.mealplan-card .mp-info { flex: 1; }
+.mealplan-card .mp-meal-type { font-size: 12px; color: var(--orange); font-weight: 700; text-transform: uppercase; }
+.mealplan-card .mp-name { font-size: 17px; font-weight: 700; margin: 4px 0; }
+.mealplan-card .mp-meta { font-size: 13px; color: var(--text-secondary); }
+.mealplan-card .mp-arrow { font-size: 20px; color: var(--text-muted); }
+
+/* Immersive Detail Modal */
+.detail-overlay {
+  position: fixed; top:0;left:0;right:0;bottom:0; background: var(--bg);
+  z-index: 1000; overflow-y: auto; animation: fadeIn 0.3s ease;
+}
+.detail-hero {
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  color: #fff; padding: 40px 24px 30px; text-align: center;
+}
+.detail-hero.cheat { background: linear-gradient(135deg, #e65100, var(--orange)); }
+.detail-close {
+  position: absolute; top: 16px; left: 16px; width: 36px; height: 36px;
+  background: rgba(255,255,255,0.25); border: none; border-radius: 50%;
+  color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center;
+}
+.detail-name { font-size: 26px; font-weight: 800; margin-bottom: 16px; }
+.detail-stats {
+  display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+}
+.detail-stat {
+  background: rgba(255,255,255,0.2); border-radius: 14px; padding: 12px 16px;
+  text-align: center; min-width: 70px;
+}
+.detail-stat .ds-val { font-size: 22px; font-weight: 800; }
+.detail-stat .ds-label { font-size: 11px; opacity: 0.8; }
+.detail-body { padding: 24px; max-width: 680px; margin: 0 auto; }
+.detail-body h3 { font-size: 18px; font-weight: 700; margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+.detail-ingredients {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;
+}
+.detail-ing { padding: 8px 16px; background: #e8f5e9; border-radius: 20px; font-size: 14px; font-weight: 500; color: var(--green-dark); }
+.detail-step {
+  display: flex; gap: 14px; padding: 16px; background: #fafafa; border-radius: 14px;
+  margin-bottom: 10px; align-items: flex-start;
+}
+.detail-step .ds-num {
+  width: 32px; height: 32px; background: var(--green); color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 15px; flex-shrink: 0;
+}
+.detail-step .ds-text { font-size: 15px; color: #444; line-height: 1.7; flex: 1; }
+.detail-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+.detail-tag { padding: 6px 14px; background: #f0f0f0; border-radius: 20px; font-size: 13px; color: #666; }
 
 /* ===== Results ===== */
 .results-section { margin-bottom: 30px; }
