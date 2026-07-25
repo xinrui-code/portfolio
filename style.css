@@ -38,7 +38,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Micr
 
 /* Projects */
 .projects{max-width:960px;margin:0 auto;padding:60px 24px}
-.project-card{display:flex;gap:40px;background:var(--card);border-radius:var(--r);padding:36px;margin-bottom:24px;border:1px solid var(--border);transition:all .3s}
+.project-card{display:flex;gap:40px;background:var(--card);border-radius:var(--r);padding:36px;margin-bottom:24px;border:1px solid var(--border);transition:all .3s;position:static}
 .project-card:hover{border-color:rgba(255,255,255,.15);background:var(--card-hover)}
 .project-card.featured{border-color:rgba(74,222,128,.2)}
 .project-preview{flex-shrink:0}
