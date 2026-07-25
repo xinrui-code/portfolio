@@ -6,7 +6,7 @@ const App = {
   allRecipes: RECIPES,
 
   // 🔑 AI API 配置（获取免费 Key: https://platform.deepseek.com）
-  AI_API_KEY: '',
+  AI_API_KEY: '',  // 面试演示时填入临时 Key，用完即删
   USE_AI: false,   // 是否启用 AI（有 Key 自动启用）
 
   init() {
@@ -49,6 +49,9 @@ const App = {
 
     document.getElementById('modalOverlay').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) this.closeModal()
+    })
+    document.getElementById('btnMealPlan').addEventListener('click', () => {
+      this.generateMealPlan()
     })
   },
 
@@ -262,40 +265,99 @@ const App = {
     document.getElementById('emptyState').style.display = ''
   },
 
+  // 📅 一键生成今日三餐
+  generateMealPlan() {
+    const pool = this.currentCategory === 'all' ? this.allRecipes :
+      this.allRecipes.filter(r => r.category === this.currentCategory)
+
+    const shuffled = [...pool].sort(() => Math.random() - 0.5)
+    // 尽量选不同类型的：早餐、午餐、晚餐
+    const breakfast = shuffled.find(r => r.tags.includes('早餐') || r.time.includes('5分钟') || r.time.includes('10分钟')) || shuffled[0]
+    const lunch = shuffled.find(r => r !== breakfast && (r.tags.includes('高蛋白') || r.tags.includes('快手'))) || shuffled[1]
+    const dinner = shuffled.find(r => r !== breakfast && r !== lunch && (r.tags.includes('低卡') || r.tags.includes('暖汤'))) || shuffled[2]
+
+    const meals = [
+      { type: '🌅 早餐', ...breakfast },
+      { type: '🌞 午餐', ...lunch },
+      { type: '🌆 晚餐', ...dinner }
+    ]
+
+    const grid = document.getElementById('resultsGrid')
+    const header = document.getElementById('resultsHeader')
+    const empty = document.getElementById('emptyState')
+
+    empty.style.display = 'none'
+    header.style.display = 'flex'
+    document.getElementById('resultsCount').textContent = '📅 今日推荐菜单'
+
+    grid.innerHTML = `
+      <div class="mealplan-meals">
+        ${meals.map((m, i) => `
+          <div class="mealplan-card" onclick="App.openDetail(${m.id})" style="animation-delay:${i*0.1}s">
+            <span class="mp-icon">${m.type.slice(0,2)}</span>
+            <div class="mp-info">
+              <div class="mp-meal-type">${m.type}</div>
+              <div class="mp-name">${m.name}</div>
+              <div class="mp-meta">🔥 ${m.calories}千卡 · 🥩 ${m.protein}g蛋白 · ⏱ ${m.time}</div>
+            </div>
+            <span class="mp-arrow">→</span>
+          </div>
+        `).join('')}
+      </div>
+      <div style="text-align:center;margin-top:8px;color:var(--text-muted);font-size:13px">
+        总热量：${meals.reduce((s,m)=>s+m.calories,0)} 千卡 · 蛋白质：${meals.reduce((s,m)=>s+m.protein,0)}g
+      </div>
+    `
+    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' })
+  },
+
+  // 📖 沉浸式菜谱详情
   openDetail(id) {
     const recipe = this.allRecipes.find(r => r.id === id)
     if (!recipe) return
 
-    const modal = document.getElementById('modalOverlay')
-    const content = document.getElementById('modalContent')
-
-    content.innerHTML = `
-      <div class="modal-handle"></div>
-      <div class="modal-name">${recipe.name}</div>
-      <div class="modal-meta">
-        <div class="modal-stat"><div class="stat-val">${recipe.calories}</div><div class="stat-label">🔥 千卡</div></div>
-        <div class="modal-stat"><div class="stat-val">${recipe.protein}g</div><div class="stat-label">🥩 蛋白质</div></div>
-        <div class="modal-stat"><div class="stat-val">${recipe.carbs}g</div><div class="stat-label">🍚 碳水</div></div>
-        <div class="modal-stat"><div class="stat-val">${recipe.fat}g</div><div class="stat-label">🧈 脂肪</div></div>
-        <div class="modal-stat"><div class="stat-val">${recipe.time}</div><div class="stat-label">⏱ 时间</div></div>
+    const heroClass = recipe.category === 'cheat' ? 'cheat' : ''
+    const overlay = document.createElement('div')
+    overlay.className = 'detail-overlay'
+    overlay.id = 'detailOverlay'
+    overlay.innerHTML = `
+      <div class="detail-hero ${heroClass}">
+        <button class="detail-close" onclick="document.getElementById('detailOverlay').remove();document.body.style.overflow=''">✕</button>
+        <div class="detail-name">${recipe.name}</div>
+        <div class="detail-stats">
+          <div class="detail-stat"><div class="ds-val">${recipe.calories}</div><div class="ds-label">🔥 千卡</div></div>
+          <div class="detail-stat"><div class="ds-val">${recipe.protein}g</div><div class="ds-label">🥩 蛋白质</div></div>
+          <div class="detail-stat"><div class="ds-val">${recipe.carbs}g</div><div class="ds-label">🍚 碳水</div></div>
+          <div class="detail-stat"><div class="ds-val">${recipe.fat}g</div><div class="ds-label">🧈 脂肪</div></div>
+          <div class="detail-stat"><div class="ds-val">${recipe.time}</div><div class="ds-label">⏱ 时间</div></div>
+        </div>
       </div>
-      <div class="modal-section">
+      <div class="detail-body">
         <h3>🛒 食材清单</h3>
-        <div class="modal-ingredients">${recipe.ingredients.map(i => `<span class="modal-ingredient">${i}</span>`).join('')}</div>
-      </div>
-      <div class="modal-section">
-        <h3>👨‍🍳 做法步骤</h3>
-        <div class="modal-steps">${recipe.steps.map((step, idx) => `
-          <div class="modal-step"><span class="step-num">${idx + 1}</span><span class="step-text">${step}</span></div>
-        `).join('')}</div>
-      </div>
-      <button class="modal-close" onclick="App.closeModal()">关闭</button>`
+        <div class="detail-ingredients">${recipe.ingredients.map(i => `<span class="detail-ing">${i}</span>`).join('')}</div>
 
-    modal.style.display = 'flex'
+        <h3>👨‍🍳 分步教程（共 ${recipe.steps.length} 步）</h3>
+        ${recipe.steps.map((step, idx) => `
+          <div class="detail-step">
+            <span class="ds-num">${idx + 1}</span>
+            <span class="ds-text">${step}</span>
+          </div>
+        `).join('')}
+
+        <div class="detail-tags">
+          ${recipe.tags.map(t => `<span class="detail-tag">#${t}</span>`).join('')}
+          <span class="detail-tag">${recipe.difficulty}</span>
+        </div>
+      </div>`
+
+    document.body.appendChild(overlay)
     document.body.style.overflow = 'hidden'
+    overlay.scrollTop = 0
   },
 
   closeModal() {
+    const overlay = document.getElementById('detailOverlay')
+    if (overlay) { overlay.remove(); document.body.style.overflow = '' }
     document.getElementById('modalOverlay').style.display = 'none'
     document.body.style.overflow = ''
   },
