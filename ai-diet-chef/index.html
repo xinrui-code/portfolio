@@ -9,14 +9,19 @@
 <body>
 
 <div class="app-wrapper">
-  <!-- Header -->
-  <header class="app-header">
+  <!-- Hero -->
+  <header class="app-hero">
     <div class="logo">🥗 AI 减脂厨师</div>
-    <div class="header-sub">不知道吃什么？告诉我你的食材，我帮你搭配</div>
+    <div class="header-sub">不知道吃什么？告诉我食材，帮你搭配健康餐</div>
+    <div class="hero-stats-row">
+      <div class="hero-stat"><div class="hs-num">50+</div><div class="hs-label">精选菜谱</div></div>
+      <div class="hero-stat"><div class="hs-num">3餐</div><div class="hs-label">智能搭配</div></div>
+      <div class="hero-stat"><div class="hs-num">0卡</div><div class="hs-label">热量精准</div></div>
+    </div>
   </header>
 
   <!-- 输入区 -->
-  <section class="input-section">
+  <section class="main-card">
     <div class="input-row">
       <input
         type="text"
@@ -30,7 +35,7 @@
     <div class="tags-area" id="tagsArea"></div>
 
     <!-- 快捷食材 -->
-    <div class="quick-ingredients">
+    <div class="quick-row">
       <span class="quick-label">常用：</span>
       <span class="quick-chip" data-ingredient="鸡胸肉">鸡胸肉</span>
       <span class="quick-chip" data-ingredient="鸡蛋">鸡蛋</span>
@@ -43,45 +48,48 @@
     </div>
 
     <!-- 身材档案 -->
-    <div class="profile-toggle" id="profileToggle" onclick="document.getElementById('profileForm').classList.toggle('open');this.classList.toggle('active')">
-      👤 填身材档案，精准推荐 <span class="toggle-arrow">▾</span>
-    </div>
-    <div class="profile-form" id="profileForm">
-      <div class="pf-row">
-        <div class="pf-item">
-          <label>性别</label>
-          <div class="pf-radio-group">
-            <button class="pf-radio active" data-gender="male" onclick="App.setGender('male',this)">👨 男</button>
-            <button class="pf-radio" data-gender="female" onclick="App.setGender('female',this)">👩 女</button>
+    <div class="profile-section">
+      <div class="profile-header" onclick="this.classList.toggle('open');document.getElementById('profileBody').classList.toggle('open')">
+        <span class="ph-left"><span class="ph-icon">👤</span> 身材档案，精准推荐</span>
+        <span class="ph-arrow">▾</span>
+      </div>
+      <div class="profile-body" id="profileBody">
+        <div class="pf-row">
+          <div class="pf-item">
+            <label>性别</label>
+            <div class="pf-radio-group">
+              <button class="pf-radio active" data-gender="male" onclick="App.setGender('male',this)">👨 男</button>
+              <button class="pf-radio" data-gender="female" onclick="App.setGender('female',this)">👩 女</button>
+            </div>
+          </div>
+          <div class="pf-item">
+            <label>年龄</label>
+            <input type="number" id="pfAge" placeholder="25" class="pf-input">
           </div>
         </div>
-        <div class="pf-item">
-          <label>年龄</label>
-          <input type="number" id="pfAge" placeholder="25" class="pf-input">
+        <div class="pf-row">
+          <div class="pf-item">
+            <label>身高 (cm)</label>
+            <input type="number" id="pfHeight" placeholder="170" class="pf-input">
+          </div>
+          <div class="pf-item">
+            <label>体重 (kg)</label>
+            <input type="number" id="pfWeight" placeholder="65" class="pf-input">
+          </div>
         </div>
+        <div class="pf-result" id="pfResult" style="display:none"></div>
       </div>
-      <div class="pf-row">
-        <div class="pf-item">
-          <label>身高 cm</label>
-          <input type="number" id="pfHeight" placeholder="170" class="pf-input">
-        </div>
-        <div class="pf-item">
-          <label>体重 kg</label>
-          <input type="number" id="pfWeight" placeholder="65" class="pf-input">
-        </div>
-      </div>
-      <div class="pf-result" id="pfResult" style="display:none"></div>
     </div>
 
     <!-- 偏好 -->
-    <div class="preference-row">
-      <span class="pref-label">🎯 偏好：</span>
+    <div class="pref-row">
+      <span class="pref-label">🎯 偏好</span>
       <button class="pref-btn active" data-category="all">全部</button>
       <button class="pref-btn" data-category="diet">🥗 减脂</button>
       <button class="pref-btn" data-category="cheat">🍕 放纵</button>
     </div>
 
-    <div class="btn-row-dual">
+    <div class="btn-row">
       <button class="btn-search" id="btnSearch">
         <span class="sparkle">✨</span> AI 推荐菜谱
       </button>
